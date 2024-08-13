@@ -1,0 +1,38 @@
+server:
+  port: 8083
+  logging:
+    level:
+      netty: INFO
+      org:
+        springframework:
+          gateway: trace
+spring:
+  cloud:
+    gateway:
+        routes:
+
+          - id: bookmarket
+            uri: http://localhost:8082
+            predicates:
+              - Path=/books/**
+
+          - id: registration
+            uri: http://localhost:8081
+            predicates:
+              - Path=/registration
+            filters:
+              - RewritePath=/registration, /auth
+
+          - id: token
+            uri: http://localhost:8081
+            predicates:
+              - Path=/login
+            filters:
+              - RewritePath=/login, /auth/token
+
+          - id: help
+            uri: https://spring.io/guides
+            predicates:
+              - Path=/help
+            filters:
+              - RedirectTo=302, https://spring.io/guides
